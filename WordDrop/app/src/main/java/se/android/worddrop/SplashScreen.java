@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 
 /**
+ * Splash screen when the application opens up
  * @author Suman Gaonkar
  */
 public class SplashScreen extends Activity {
 
+	/**
+	 * Creates the layout for splash screen and sets the timer for it's appearance
+	 * @param savedInstanceState saves the state of application
+	 */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(se.android.worddrop.R.layout.splash);
 
@@ -30,11 +34,12 @@ public class SplashScreen extends Activity {
         timerThread.start();
     }
 
+    /**
+     * Auto-generated method stub
+     */
     @Override
     protected void onPause() {
-        // TODO Auto-generated method stub
         super.onPause();
         finish();
     }
-
 }

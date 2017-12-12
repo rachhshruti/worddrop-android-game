@@ -33,6 +33,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
+ * Play game screen where the user tries to make as many words as possible
+ * on the grid
  * @author Shruti Rachh, Soumya Achar, Pratik Sanghvi
  */
 public class PlayGameActivity extends AppCompatActivity implements View.OnTouchListener{
@@ -65,8 +67,12 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
     int shrinkLetterFlag = 0;
     int movesCount = 0;
     private Set<String> deleteColorButtonSet =new HashSet<String>();
-    private List<String> swipedWords = new ArrayList<String>();    //Change Request : Show a list of swipped words. - Pratik Sanghvi
+    private List<String> swipedWords = new ArrayList<String>();
 
+    /**
+     * Creates the layout for play game screen
+     * @param savedInstanceState saves the state of application
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +83,7 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         context=getApplicationContext();
         myTrie.buildTrie(context,myTrie);
 
-        //Setting game layout and its dimensions relatively
+        //Setting game layout and its dimensions relative to screen size so that it works for tablets as well
         gridLayout=(GridLayout)findViewById(R.id.gridview);
         gridRowsCount=gridLayout.getRowCount();
         gridColumnsCount=gridLayout.getColumnCount();
@@ -126,15 +132,20 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
 
     }
 
+    /**
+     * Pauses the timer in case of timed mode when a game is temporarily paused
+     */
     @Override
     protected void onStop(){
         super.onStop();
         if(gameMode.equals("TIMED")) {
-            //timer.cancel();
             pauseTimer=true;
         }
     }
 
+    /**
+     * Cancels the timer in case of timed mode when game is restarted
+     */
     @Override
     protected void onDestroy(){
         super.onDestroy();
@@ -143,6 +154,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Resumes the timer when the game is resumed
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -152,7 +166,11 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
-    //Setting menus programatically.
+    /**
+     * Creates play game menu
+     * @param menu
+     * @return true when successfully created
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -160,6 +178,11 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         return true;
     }
 
+    /**
+     * Checks what option is selected on the action bar 
+     * @param item
+     * @return true when the action is successfully completed
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -183,6 +206,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Sets the game tabs dimensions relative to the screen size
+     * @param screenDimensions
+     */
     private void setGameTabsDimensions(int[] screenDimensions) {
         LinearLayout gameTabs = (LinearLayout) findViewById(R.id.gameDetails);
         int gameTabsWidth = screenDimensions[0];
@@ -197,6 +224,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Sets powerup tabs dimensions relative to the screen size
+     * @param screenDimensions
+     */
     private void setPowerupTabsDimensions(int[] screenDimensions) {
         GridLayout gameTabs=(GridLayout)findViewById(R.id.powerups);
         int gameTabsWidth=screenDimensions[0];
@@ -217,6 +248,12 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Sets grid dimensions relative to screen size
+     * @param view grid view
+     * @param width screen width
+     * @param height screen height
+     */
     private void setDimensions(View view,int width,int height){
         ViewGroup.LayoutParams layoutParams=view.getLayoutParams();
         layoutParams.width = width;
@@ -224,6 +261,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         view.setLayoutParams(layoutParams);
     }
 
+    /**
+     * Sets the remaining powerup count texts for display on the screen 
+     */
     private void setTxtViewPowerupCount()
     {
         TextView tvScramble = (TextView) findViewById(se.android.worddrop.R.id.PowerUp0Cnt);
@@ -236,6 +276,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         tvShrinkLetter.setText(Integer.toString(powerup.getShrinkLetterCnt()));
     }
 
+    /**
+     * Gets the phone screen size
+     * @return
+     */
     private int[] getScreenSize(){
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -246,6 +290,11 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         return dimensions;
     }
 
+    /**
+     * Sets the grid cells with the letters and colors based on the grid dimensions
+     * @param tile tile matrix which stores letters and colors information
+     * @param gridDimension dimensions of the grid
+     */
     private void setGridCells(Tile tile[][],int gridDimension){
         for(int i=0;i<tile.length;i++) {
             for (int j = 0; j < tile[i].length; j++) {
@@ -266,6 +315,13 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Checks if the tile object button is touched so as to detect the swipes that user
+     * makes to form words
+     * @param v view
+     * @param event motion event to capture in what direction the user swiped
+     * @return true when the tile object button is touched
+     */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int action = MotionEventCompat.getActionMasked(event);
@@ -289,6 +345,7 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
                     TextView tvDeleteColor = (TextView) findViewById(se.android.worddrop.R.id.PowerUp1Cnt);
                     tvDeleteColor.setText(Integer.toString(cntPowerCount - 1));
                 }
+            
                 //Checks whether the user has clicked on shrink letter powerup
                 if (shrinkLetterFlag == 1) {
                     int shrinkID = intersectedOrNot(event.getRawX(), event.getRawY());
@@ -363,6 +420,7 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
                 lastButtonId = 0;
                 tvSwippedWord.setText(wordFormed);
                 movesCount = movesCount + 1;
+                
                 //Searches for the swipped word in the wordlist
                 boolean isWordValid = myTrie.searchWord(wordFormed.toLowerCase());
 
@@ -373,7 +431,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
                         Tile t[][]=grid.refillGrid(btnIdsSwipped);
                         setGridCells(t,gridWidth);
                         validWordsCount = validWordsCount + 1;
-                        swipedWords.add(wordFormed.toLowerCase());  //Change Request : Show a list of swipped words. - Pratik Sanghvi
+                        
+                        // Show a list of swipped words
+                        swipedWords.add(wordFormed.toLowerCase());  
                         updateScore(btnIdsSwipped.size());
                     }
                 }
@@ -399,6 +459,12 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
                 return super.onTouchEvent(event);
         }
     }
+    
+    /**
+     * Updates the score depending on the the number of letters that were
+     * swiped to form a word
+     * @param noOfLettersSwipped number of letters swiped in a word
+     */
     private void updateScore(int noOfLettersSwipped){
 
         TextView scoreValTxt=(TextView)findViewById(R.id.textView3);
@@ -407,7 +473,12 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         scoreValTxt.setText(""+score);
     }
 
-    //This method returns the swipped tile resourceid.
+    /**
+     * Gets the id of the grid cell that was touched or swiped
+     * @param x row of grid
+     * @param y column of grid
+     * @return id of grid cell
+     */
     private int intersectedOrNot(float x, float y) {
         for (int i = 0; i < gridRowsCount; i++) {
             for (int j = 0; j < gridColumnsCount; j++) {
@@ -436,7 +507,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         return -1;
     }
 
-    //This method reverts the tile colors to the previous color if the word swiped is not legit.
+    /**
+     * Reverts the tile colors to the previous color if the word swiped is incorrect
+     */
     private void rollbackButtonColors(){
         Iterator<Map.Entry<Integer, Integer>> iterator = swipedButtonsColorMap.entrySet().iterator();
         while(iterator.hasNext()){
@@ -446,6 +519,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Starts the timer count down
+     * @param seconds number of seconds to be set
+     */
     void startTimerCountdown(final int seconds){
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -470,11 +547,18 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }, 0, 1000);
     }
 
+    /**
+     * Stops the timer
+     */
     void stopTimer()
     {
         pauseTimer=true;
     }
 
+    /**
+     * Calls game over activity when game ends and sends the score, user id and game mode just
+     * in case user decides to play again in the same game mode
+     */
     void callGameOverActivity(){
         Intent moveToGameOver = new Intent(PlayGameActivity.this, GameOverActivity.class);
         moveToGameOver.putExtra("Score", score);
@@ -484,12 +568,20 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         finish();
     }
 
-    //Change Request
+    /**
+     * Show words button click event which displays list of words already swiped by the user
+     * @param view show words button
+     */
     public void btnShowWordsClick(View view) {
         System.out.println("Number of words formed "+swipedWords.size());
         showSwippedWords(swipedWords);
     }
 
+    /**
+     * Scramble powerup button click event which scrambles the grid to help user finds some
+     * words when they are stuck
+     * @param view scramble button
+     */
     public void btnScrambleClick(View view) {
         int cntPowerCount = powerup.getScrambleCnt();
         if (cntPowerCount > 0) {
@@ -502,6 +594,11 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Delete color powerup button click event which deletes all the grid cells that have same
+     * color as the selected cell
+     * @param view delete color button
+     */
     public void btnDeleteColorClick(View view) {
         int cntPowerCount = powerup.getDeleteColorCnt();
         if(cntPowerCount > 0) {
@@ -519,6 +616,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Shrink letter powerup button click event which disappears the selected cell
+     * @param view shrink letter button
+     */
     public void btnShrinkLetterClick(View view) {
         int cntPowerCount = powerup.getShrinkLetterCnt();
         if(cntPowerCount > 0) {
@@ -536,6 +637,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         }
     }
 
+    /**
+     * Shows powerup alert when there are not sufficient powerups left to use and gives an option
+     * to purchase powerup based on the total score of the user
+     */
     private void showPowerUpAlert()
     {
         pauseTimer = true;
@@ -561,6 +666,11 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         alertDialog.show();
     }
 
+    /**
+     * Asks confirmation when user uses scramble powerup so as to prevent accidental
+     * scramble of the grid
+     * @param cntPowerCount scramble powerup count
+     */
     private void showScrambleConfirmation(final int cntPowerCount)
     {
         pauseTimer = true;
@@ -589,6 +699,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         alertDialog.show();
     }
 
+    /**
+     * Shows quit game confirmation alert
+     */
     private void showQuitGameAlert()
     {
         pauseTimer = true;
@@ -612,6 +725,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         alertDialog.show();
     }
 
+    /**
+     * Shows exit game confirmation alert
+     */
     private void showExitGameAlert()
     {
         pauseTimer = true;
@@ -639,6 +755,9 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         alertDialog.show();
     }
 
+    /**
+     * Shows restart game confirmation alert
+     */
     private void showRestartGameAlert()
     {
         pauseTimer=true;
@@ -667,7 +786,10 @@ public class PlayGameActivity extends AppCompatActivity implements View.OnTouchL
         alertDialog.show();
     }
 
-    //Change Request
+    /**
+     * Shows list of swipped words when the show words button is clicked
+     * @param lstSwippedWords list of swiped words
+     */
     private void showSwippedWords(List<String> lstSwippedWords)
     {
         pauseTimer=true;

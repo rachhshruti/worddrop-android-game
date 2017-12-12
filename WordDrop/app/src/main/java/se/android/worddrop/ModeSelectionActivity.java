@@ -57,9 +57,9 @@ public class ModeSelectionActivity extends AppCompatActivity implements View.OnC
     }
 
     /**
-     * Checks if exit game is clicked on the action bar
+     * Checks what option is selected on the action bar
      * @param item
-     * @return true when game is sucessfully exited
+     * @return true when the action is successfully completed
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
+ * This class contains methods that implements the powerups: scramble, delete color and
+ * shrink letter
  * @author Shruti Rachh, Soumya Achar
  */
 public class PowerUpManager {
@@ -25,11 +27,19 @@ public class PowerUpManager {
     private int validWordsCnt = 0;
     private DBHelper dbHelper;
 
+    /**
+     * Initializes DBHelper to connect with the database
+     * @param context used to open or create a database
+     */
     public PowerUpManager(Context context)
     {
         dbHelper = new DBHelper(context);
     }
 
+    /**
+     * Enum that stores the count of each of the powerups
+     * @author Shruti Rachh
+     */
     public static enum PowerupType {
 
         SCRAMBLE("SCRAMBLES_NUM",0),
@@ -38,6 +48,7 @@ public class PowerUpManager {
 
         private String stringValue;
         private int intValue;
+        
         private PowerupType(String toString, int value) {
             stringValue = toString;
             intValue = value;
@@ -49,6 +60,9 @@ public class PowerUpManager {
         }
     }
 
+    /**
+     * Closes the database connection
+     */
     protected void finalize() throws Throwable{
         try{
             dbHelper.closeConnections();}
@@ -62,63 +76,119 @@ public class PowerUpManager {
 
     }
 
+    /**
+     * Getter method for user id
+     * @return user id
+     */
     public int getUserId(){
         return userId;
     }
 
+    /**
+     * Setter method for user id
+     * @param userId id of user to be set
+     */
     public void setUserId(int userId){
         this.userId=userId;
     }
 
+    /**
+     * Gets the shrink letter powerup count
+     * @return shrink letter powerup count
+     */
     public int getShrinkLetterCnt(){
         shrinkLetterCnt=getPowerupCount(PowerupType.SHRINK_LETTER.toString());
         return shrinkLetterCnt;
     }
 
+    /**
+     * Sets the shrink letter powerup count
+     * @param shrinkLetterCnt count to be set
+     */
     public void setShrinkLetterCnt(int shrinkLetterCnt){
         updatePowerupCount(PowerupType.SHRINK_LETTER.toString(),shrinkLetterCnt);
         this.shrinkLetterCnt=shrinkLetterCnt;
     }
 
+    /**
+     * Gets the delete color powerup count
+     * @return delete color powerup count
+     */
     public int getDeleteColorCnt(){
         deleteColorCnt=getPowerupCount(PowerupType.DELETE_COLOR.toString());
         return deleteColorCnt;
     }
 
+    /**
+     * Sets delete color powerup count
+     * @param deleteColorCnt count to be set
+     */
     public void setDeleteColorCnt(int deleteColorCnt){
         updatePowerupCount(PowerupType.DELETE_COLOR.toString(),deleteColorCnt);
         this.deleteColorCnt=deleteColorCnt;
     }
 
+    /**
+     * Gets scramble powerup count
+     * @return scramble powerup count
+     */
     public int getScrambleCnt(){
         scrambleCnt=getPowerupCount(PowerupType.SCRAMBLE.toString());
         return scrambleCnt;
     }
 
+    /**
+     * Sets the scramble powerup count
+     * @param scrambleCnt count to be set
+     */
     public void setScrambleCnt(int scrambleCnt){
         updatePowerupCount(PowerupType.SCRAMBLE.toString(),scrambleCnt);
         this.scrambleCnt=scrambleCnt;
     }
 
+    /**
+     * Gets the total score of the user using user id
+     * @return
+     */
     public int getTotalScore(){
         totalScore = dbHelper.getTotalScore(userId);
         return totalScore;
     }
 
+    /**
+     * Sets the total score in database using user id
+     * @param totalScore total score to be updated
+     */
     public void setTotalScore(int totalScore){
         dbHelper.updateTotalScore(totalScore,userId);
         this.totalScore =totalScore;
     }
 
+    /**
+     * Gets the powerup count based on the type of powerup
+     * @param powerupType scramble, delete color or shrink letter
+     * @return powerup count
+     */
     private int getPowerupCount(String powerupType){
        return dbHelper.getPowerupCount(powerupType,userId);
     }
 
+    /**
+     * Update powerup count in the database based on the type of powerup
+     * @param powerupType scramble, delete color or shrink letter
+     * @param count powerup count to be updated in database
+     */
     private  void updatePowerupCount(String powerupType,int count) {
         dbHelper.updatePowerUpCount(count,powerupType,userId);
     }
 
-    //Shuffles the grid such that some valid words are formed.
+    /**
+     * Shuffles the grid such that some valid words are formed
+     * @param grid game grid containing letters
+     * @param trie word trie object to check for possible words 
+     * that can be formed in the grid
+     * @return Tile object array of the grid after scramble
+     */
     public Tile[][] scramble(Grid grid, WordTrie trie) {
         Tile[][] tile = grid.getTile();
         tilesArr = convertGridToArray(tile);
@@ -130,6 +200,7 @@ public class PowerUpManager {
             int cnt = 0;
             int x=0,y=0;
             List<Integer> adjCells = new ArrayList<Integer>();
+            
             //Places the tiles that form words in adjacent positions on the grid
             for (int i = 0; i < validWordsCnt; i++) {
                 int randomNum = random.nextInt(randInd.size());
@@ -165,6 +236,15 @@ public class PowerUpManager {
         return tile;
     }
 
+    /**
+     * Gets the adjacent cells given a grid coordinate to place the word in adjacent positions
+     * Uses a random index so as to have different adjacent orientations for a word each time
+     * @param gridx row index of grid
+     * @param gridy column index of grid
+     * @param gridSize size of the grid
+     * @param randInd random index
+     * @return list of adjacent indices in the grid where the word can be placed
+     */
     private List<Integer> getAdjacentCells(int gridx, int gridy, int gridSize,List<Integer> randInd) {
         Point neighbor[] = new Point[4];
         neighbor[0]=new Point((gridx-1),gridy);
@@ -181,6 +261,12 @@ public class PowerUpManager {
         return adjCell;
     }
 
+    /**
+     * Find words on the grid so that when it is scrambled, few words can be placed in
+     * adjacent positions
+     * @param trie word trie object used to find words
+     * @return list of words if found, else null
+     */
     private List<Tile> findWords(WordTrie trie){
         if(tilesArr!=null && trie!=null) {
             List<Tile> words = new ArrayList<Tile>();
@@ -210,7 +296,9 @@ public class PowerUpManager {
                                 words.add(tilesArr.get(i));
                                 words.add(tilesArr.get(j));
                                 words.add(tilesArr.get(k));
-                                removeUsedTiles(i, j, k);
+                                tilesArr.remove(i);
+                                tilesArr.remove(j);
+                                tilesArr.remove(k);
                                 validWordsCnt++;
                             }
                         }
@@ -225,6 +313,11 @@ public class PowerUpManager {
         return null;
     }
 
+    /**
+     * Used by scramble method to shuffle the tiles in the grid
+     * @param tile tile matrix in the grid which stores letters and colors information
+     * @return list of indices generated randomly
+     */
     private List<Integer> generateRandomIndArr(Tile[][] tile){
         List<Integer> randInd=new ArrayList<Integer>();
         for(int i=0;i<(tile.length*tile[0].length);i++){
@@ -233,13 +326,11 @@ public class PowerUpManager {
         return randInd;
     }
 
-    private void removeUsedTiles(int i, int j, int k){
-
-        tilesArr.remove(i);
-        tilesArr.remove(j);
-        tilesArr.remove(k);
-    }
-
+    /**
+     * Converts grid into array, used by scramble method
+     * @param tile tile matrix in the grid
+     * @return tile array
+     */
     private List<Tile> convertGridToArray(Tile[][] tile){
         List<Tile> tilesArr=new ArrayList<Tile>();
         for(int i=0;i<tile.length;i++){
@@ -250,6 +341,13 @@ public class PowerUpManager {
         return tilesArr;
     }
 	
+    /**
+     * Delete color power implemented which deletes all the cells in the
+     * grid having the same color as the selected cell
+     * @param changeTile tile matrix of the grid
+     * @param button tile that is pressed
+     * @return set of tiles to be deleted
+     */
 	public Set deleteColor (Tile changeTile [][], String button) {
        try {
            Thread.sleep(400);
@@ -258,7 +356,7 @@ public class PowerUpManager {
        }
        Set<String> deleteColorButtonSet =new HashSet<String>();
 
-       // get all the buttons with Tile colours of button
+       // Gets all the buttons with Tile colors of button
        int row = button.charAt(button.length()-2)-'0';
        int column = button.charAt(button.length()-1)-'0';
        int tileColorSelected = changeTile[row][column].getTileColor();

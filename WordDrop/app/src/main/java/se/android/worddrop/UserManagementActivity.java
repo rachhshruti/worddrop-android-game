@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 
 /**
+ * Home screen- User selection and creation
  * @author Pratik Sanghvi
  */
 public class UserManagementActivity extends AppCompatActivity implements OnClickListener, OnItemSelectedListener{
@@ -30,6 +31,10 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
     EditText eTxtUserName;
     DBHelper dbHelper;
 
+    /**
+     * Creates the layout for home screen
+     * @param savedInstanceState saves the state of application
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +71,11 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         super.onResume();
     }
 
+    /**
+     * Creates home screen or main menu
+     * @param menu
+     * @return true when successfully created
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -73,7 +83,10 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         return true;
     }
 
-    //Releases DB connections
+    /**
+     * Closes database connection
+     * @throws Throwable
+     */
     protected void finalize() throws Throwable{
         try{
             dbHelper.closeConnections();}
@@ -87,6 +100,11 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
 
     }
 
+    /**
+     * Checks what option is selected on the action bar
+     * @param item
+     * @return true when the action is successfully completed
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -107,6 +125,12 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Checks whether user has been selected or created when "Next" button
+     * is clicked, if not it displays the appropriate error message before
+     * moving forward with the game. 
+     * @param v next button
+     */
     @Override
     public void onClick(View v){
         switch(v.getId()){
@@ -115,7 +139,8 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
                 boolean isUserSelected=true;
                 String newUserName = eTxtUserName.getText().toString();
                 if (newUserName != null && newUserName != "" && !newUserName.equals("")) {
-                    //Check username 15 character limit
+                    
+                	// Checks if username is within 15 characters limit
                     if(newUserName.length() <= 15){
                         ArrayList existingUsersList = dbHelper.getAllUsers();
                         if(!existingUsersList.contains(newUserName)){
@@ -157,6 +182,9 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         }
     }
 
+    /**
+     * Shows no user selected alert
+     */
     private void showNoUserSelectedAlert(){
         final AlertDialog alertDialog = new AlertDialog.Builder(UserManagementActivity.this).create();
         alertDialog.setCancelable(false);
@@ -171,6 +199,9 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         alertDialog.show();
     }
 
+    /**
+     * Shows this alert when username is beyond 15 characters limit
+     */
     private void showUserNameLengthAlert(){
         final AlertDialog alertDialog = new AlertDialog.Builder(UserManagementActivity.this).create();
         alertDialog.setCancelable(false);
@@ -185,6 +216,9 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         alertDialog.show();
     }
 
+    /**
+     * Shows user already exists alert
+     */
     private void showUserAlreadyExistsAlert(){
         final AlertDialog alertDialog = new AlertDialog.Builder(UserManagementActivity.this).create();
         alertDialog.setCancelable(false);
@@ -199,6 +233,13 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         alertDialog.show();
     }
 
+    /**
+     * Gets the selected user from list of existing users
+     * @param parent
+     * @param view
+     * @param pos
+     * @param id
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         if(parent.equals(spinnerExistingUsers)){
@@ -215,6 +256,9 @@ public class UserManagementActivity extends AppCompatActivity implements OnClick
         // Another interface callback
     }
 
+    /**
+     * Gets all the users from the database and populates in the dropdown
+     */
     public void loadSpinnerData(){
         ArrayList<String> userList = dbHelper.getAllUsers();
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, userList);

@@ -10,12 +10,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
+ * Purchase powerup screen which lets the user to purchase powerups using their total score
  * @author Suman Gaonkar
  */
 public class PurchasePowerUp extends AppCompatActivity {
     int totalScore, ctShrinkLetter, ctDeleteColor,ctScramble,userId;
     PowerUpManager powerUp;
 
+    /**
+     * Creates the layout for purchase powerup screen
+     * @param savedInstanceState saves the state of application
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +34,11 @@ public class PurchasePowerUp extends AppCompatActivity {
         setTxtViewValues();
     }
 
-
+    /**
+     * Creates the purchase powerups menu
+     * @param menu
+     * @return true when successfully created
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -37,14 +46,17 @@ public class PurchasePowerUp extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Checks what option is selected on the action bar
+     * @param item
+     * @return true when the action is successfully completed
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-
-            //noinspection SimplifiableIfStatement
             case R.id.mi_exitapplicationPurchasePower :{
                 Intent exitAppIntent = new Intent(this, UserManagementActivity.class);
                 exitAppIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -61,6 +73,9 @@ public class PurchasePowerUp extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Sets the text for the total score and powerups
+     */
     public void setTxtViewValues()
     {
         //setting total score
@@ -80,18 +95,35 @@ public class PurchasePowerUp extends AppCompatActivity {
         ctScramble = powerUp.getScrambleCnt();
         txtViewScramble.setText(Integer.toString(ctScramble));
     }
+    
+    /**
+     * Purchase shrink letter powerup button click event
+     * @param view button that is clicked
+     */
     public void btnPurchaseShrinkLetterClick(View view) {
         purchasePowerupWithType(PowerUpManager.PowerupType.SHRINK_LETTER);
     }
 
+    /**
+     * Purchase scramble powerup button click event
+     * @param view button that is clicked
+     */
     public void btnPurchaseScrambleClick(View view) {
         purchasePowerupWithType(PowerUpManager.PowerupType.SCRAMBLE);
     }
 
+    /**
+     * Purchase delete color button click event
+     * @param view button that is clicked
+     */
     public void btnPurchaseDeleteColorClick(View view) {
         purchasePowerupWithType(PowerUpManager.PowerupType.DELETE_COLOR);
     }
 
+    /**
+     * Purchases powerup given the type of powerup
+     * @param selectedPowerUp powerup to be purchased
+     */
     private void purchasePowerupWithType(PowerUpManager.PowerupType selectedPowerUp)
     {
         switch (selectedPowerUp)
