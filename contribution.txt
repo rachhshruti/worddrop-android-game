@@ -1,0 +1,4 @@
+Pratik : user management, mode management, timer, moves count
+Shruti : grid, swipe letters, scramble powerup, score, made it compatible for all phone screen sizes
+Soumya: word detection, show words, delete color and shrink letter powerups
+Suman: purchase powerups, splash screen, game over screen, database
